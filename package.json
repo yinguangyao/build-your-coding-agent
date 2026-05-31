@@ -1,0 +1,15 @@
+{
+  "name": "build-your-coding-agent",
+  "version": "1.0.0",
+  "description": "从零实现 pi —— 一本写给 web 工程师的 Coding Agent 小册",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev docs/booklet",
+    "docs:build": "vitepress build docs/booklet",
+    "docs:preview": "vitepress preview docs/booklet"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.3"
+  }
+}
