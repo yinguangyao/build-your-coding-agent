@@ -1,3 +1,32 @@
+> **《从零实现一个 Coding Agent》系列 · 第 1 篇**
+>
+> 这是本系列的第一篇。我们会从最朴素的一次 HTTP 请求开始，一章一章地把一个真正能读写文件、执行命令、自己决定下一步干什么的编码助手（本系列叫它 **pi**）搭出来——不用任何 agent 框架，每一行代码都自己写、都讲清楚为什么。
+
+## 写在前面：这个系列要干什么
+
+市面上的 coding agent（Claude Code、Cursor、Cline……）看起来很神秘：它能听懂你的需求，自己读代码、改文件、跑测试、看报错、再修。但当你把它拆开，会发现底层其实只有几个朴素的零件：**一次 LLM 调用、一个流式解析器、一组工具、一个 while 循环**。把这几样东西拼起来，就是一个 agent。
+
+这个系列的目标，就是**带你从零、用纯 TypeScript、不依赖任何 agent 框架，一行一行把这些零件造出来并拼成一个完整的 coding agent**。我们会一边写，一边对照真实开源实现 pi 的做法，告诉你"玩具版"和"生产版"的差距在哪。
+
+大致的路线是这样的（从一次请求，逐步长成一个 agent）：
+
+| 阶段 | 你会得到什么 |
+| --- | --- |
+| 一次 LLM 调用（**本篇**） | 看懂大模型 API 的请求/响应长什么样 |
+| 流式输出 | 让回答一个字一个字地冒出来（SSE） |
+| 工具调用 | 让模型能调用 `read` / `bash` / `edit` 等工具 |
+| Agent 循环 | 把"调用工具→喂回结果→再调用"接成自动循环 |
+| 系统提示词与身份 | 给 agent 一个稳定的人设和行为约束 |
+| 多 provider 适配 | 一套代码同时支持 OpenAI / Anthropic / Gemini |
+
+**适合谁读**：会一点 TypeScript/JavaScript，对大模型 API 好奇，想知道"agent 到底是怎么转起来的"的人。不需要你提前懂 agent，我们从零讲起。
+
+**怎么读**：每篇都能独立跑通，代码全部在本仓库里（见每章 §写代码 一节）。建议边读边敲、边敲边跑。
+
+好，热身结束，从最简单的一次请求开始。
+
+---
+
 # 第 1 章 一次 LLM 调用
 
 > 本章我们**不写 agent**，也**不流式**。只用一次普通的 HTTP `fetch`，发一段文字给一个大模型，把它的回复打印出来。
@@ -180,6 +209,8 @@ user:   把当前目录下所有 .ts 文件中的 TODO 注释列出来
 pi 把这些值归一化成 `StopReason`（`packages/ai/src/types.ts:275`）：`"stop" | "length" | "toolUse" | "error" | "aborted"`。
 
 ## 1.5 写代码
+
+> 📦 本章完整源码就在当前这个 git 仓库里：[`docs/booklet/code/ch01/hello.ts`](code/ch01/hello.ts)（GitHub：[build-your-coding-agent](https://github.com/yinguangyao/build-your-coding-agent/blob/main/docs/booklet/code/ch01/hello.ts)）。想直接跑的话，clone 下来配好下面三个环境变量就行，不必照着手敲。
 
 新建一个目录，初始化项目：
 
